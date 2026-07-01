@@ -1,35 +1,67 @@
 using CloudGame.Domain.Model;
 using MassTransit;
 using NotificationApi.Consumer;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSwaggerGen();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.AddMassTransit(x =>
+try
 {
-    x.AddConsumer<UserCreatedConsumer>();
-    x.UsingRabbitMq((ctx, cfg) =>
+    Log.Information("Starting up the application...");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddSwaggerGen();
+
+    builder.Services.AddMassTransit(x =>
     {
-        cfg.Host("host.docker.internal", "/", h =>
+        x.AddConsumer<UserCreatedConsumer>();
+        x.UsingRabbitMq((ctx, cfg) =>
         {
-            h.Username("guest");
-            h.Password("guest");
-        });
+            cfg.Host("host.docker.internal", "/", h =>
+            {
+                h.Username("guest");
+                h.Password("guest");
+            });
 
-        cfg.ReceiveEndpoint("UserCreatedEvent", e =>
-        {
-            e.ConfigureConsumer<UserCreatedConsumer>(ctx);
-        });
+            cfg.ReceiveEndpoint("UserCreatedEvent", e =>
+            {
+                e.ConfigureConsumer<UserCreatedConsumer>(ctx);
+            });
 
-        cfg.Publish<UserCreatedEvent>(p =>
-        {
-            p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
-        });
+            cfg.Publish<UserCreatedEvent>(p =>
+            {
+                p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
+            });
 
+        });
     });
-});
 
-var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
-app.Run();
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    Log.Information("The application has been built, and star the pipeline setup has started.");
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    Log.Information("Pipeline successfully configured and application initialized...");
+
+    app.Run();
+}
+catch (Exception ex) when (ex.GetType().Name != "HostAbortedException")
+{
+    Log.Fatal(ex, "Application failed to start");
+}
+catch (Exception)
+{
+    throw;
+}
+finally
+{
+    Log.Information("Shutting down the application...");
+    Log.CloseAndFlush();
+}
