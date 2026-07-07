@@ -1,5 +1,5 @@
-﻿using CloudGame.Domain.Model;
-using MassTransit;
+﻿using MassTransit;
+using CloudGame.Domain.Events.User;
 
 namespace NotificationApi.Consumer
 {
@@ -15,7 +15,7 @@ namespace NotificationApi.Consumer
 
             _logger.LogInformation(
                 "Boas vindas {Nome} ao CloudGame!!",
-                user.Nome
+                user.Name
                 );
         }
     }
