@@ -1,10 +1,12 @@
-﻿namespace NotificationApi.Model
+﻿namespace CloudGame.Contracts.Events;
+
+public record PaymentProcessedEvent
 {
-    public class PaymentProcessedEvent
-    {
-        public int paymentiD {  get; set; }
-        public string? nome { get; set; }
-        public string? email { get; set; }
-        public string? status { get; set; }
-    }
+    public Guid PaymentId { get; set; }
+    public Guid OrderId { get; set; }
+    public int UserId { get; set; }
+    public int GameId { get; set; }
+    public decimal Price { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime ProcessedAt { get; set; }
 }

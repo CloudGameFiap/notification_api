@@ -13,11 +13,18 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .WriteTo.Console());
+
     builder.Services.AddSwaggerGen();
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserCreatedConsumer>();
+    x.AddConsumer<PaymentProcessedConsumer>();
     x.UsingRabbitMq((ctx, cfg) =>
     {
         var rabbitMqSection = builder.Configuration.GetRequiredSection("RabbitMQ")!;

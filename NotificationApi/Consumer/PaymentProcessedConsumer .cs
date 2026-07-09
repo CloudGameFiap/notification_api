@@ -1,5 +1,5 @@
-﻿using MassTransit;
-using NotificationApi.Model;
+﻿using CloudGame.Contracts.Events;
+using MassTransit;
 
 namespace NotificationApi.Consumer
 {
@@ -16,11 +16,10 @@ namespace NotificationApi.Consumer
         {
             var payment = context.Message;
 
-            if (payment.status == "Approved")
+            if (payment.Status == "Approved")
             {
                 _logger.LogInformation(
-                    "Pagamento aprovado! Enviando e-mail de confirmação para {Email}",
-                    payment.email
+                    "Pagamento aprovado! Enviando e-mail a aprovação"
                 );
 
                 // Aqui envia o e-mail de confirmação
@@ -28,8 +27,7 @@ namespace NotificationApi.Consumer
             else
             {
                 _logger.LogInformation(
-                    "Pagamento recusado para {Email}, nenhum e-mail enviado.",
-                    payment.email
+                    "Pagamento recusado."
                 );
             }
         }
