@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_REGISTRY-}notificationapi
     build:
       context: .
-      dockerfile: ./NotificationApi/Dockerfile
+      dockerfile: ./src/NotificationApi/Dockerfile
     user: "root"              
     restart: unless-stopped        
     networks:

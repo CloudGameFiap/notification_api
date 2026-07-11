@@ -2,5 +2,7 @@
   <Folder Name="/Docker/">
     <File Path="docker-compose.yml" />
   </Folder>
-  <Project Path="NotificationApi/NotificationApi.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/NotificationApi/NotificationApi.csproj" />
+  </Folder>
 </Solution>
