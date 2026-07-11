@@ -1,3 +1,4 @@
 <Solution>
+  <Folder Name="/Docker/" />
   <Project Path="NotificationApi/NotificationApi.csproj" />
 </Solution>

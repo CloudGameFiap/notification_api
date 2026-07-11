@@ -1,7 +1,6 @@
 using MassTransit;
 using NotificationApi.Consumer;
 using Serilog;
-using CloudGame.Domain.Events.User;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -11,15 +10,14 @@ try
 {
     Log.Information("Starting up the application...");
 
-    var builder = WebApplication.CreateBuilder(args);
+    var builder = Host.CreateApplicationBuilder(args);
 
-    builder.Host.UseSerilog((context, services, configuration) => configuration
-    .ReadFrom.Configuration(context.Configuration)
-    .ReadFrom.Services(services)
-    .Enrich.FromLogContext()
-    .WriteTo.Console());
-
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSerilog((hostingContext, configuration) =>
+    {
+        configuration
+            .ReadFrom.Configuration(builder.Configuration);
+    });
+   
 
 builder.Services.AddMassTransit(x =>
 {
@@ -38,37 +36,12 @@ builder.Services.AddMassTransit(x =>
             h.Password(password);
         });
 
-        cfg.ConfigureEndpoints(ctx);
-
-        //cfg.Message<UserCreatedEvent>(m => m.SetEntityName("UserCreatedEvent"));
-
-        //cfg.ReceiveEndpoint("UserCreatedEvent", e =>
-        //{
-        //    e.ConfigureConsumer<UserCreatedConsumer>(ctx);
-
-        //    //// Vincula a fila diretamente ao exchange que o producer usa
-        //    //e.Bind("CloudGame.Domain.Events.User:UserCreatedEvent", s =>
-        //    //{
-        //    //    s.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
-        //    //});
-        //});
-
-        //cfg.Publish<UserCreatedEvent>(p =>
-        //{
-        //    p.ExchangeType = RabbitMQ.Client.ExchangeType.Direct;
-        //});
+        cfg.ConfigureEndpoints(ctx);       
 
         });
     });
 
-    var app = builder.Build();
-
-    app.UseSerilogRequestLogging();
-
-    Log.Information("The application has been built, and star the pipeline setup has started.");
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var app = builder.Build();    
 
     Log.Information("Pipeline successfully configured and application initialized...");
 

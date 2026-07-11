@@ -1,0 +1,17 @@
+services:
+  notification.api:
+    image: ${DOCKER_REGISTRY-}notificationapi
+    build:
+      context: .
+      dockerfile: ./NotificationApi/Dockerfile
+    user: "root"
+    environment:
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false             
+    restart: unless-stopped        
+    networks:
+      - cloudgame-network
+  
+networks:
+  cloudgame-network:
+    external: true
+    name: cloudgame-network
