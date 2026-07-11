@@ -1,4 +1,6 @@
 <Solution>
-  <Folder Name="/Docker/" />
+  <Folder Name="/Docker/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="NotificationApi/NotificationApi.csproj" />
 </Solution>
