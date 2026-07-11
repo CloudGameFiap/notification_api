@@ -1,0 +1,27 @@
+apiVersion:  apps/v1 
+kind:  Deployment 
+metadata: 
+  name:  notification-api 
+  labels: 
+    app:  notification-api
+    tier:  backend  
+spec: 
+  replicas:  3 
+  selector: 
+    matchLabels: 
+      app:  notification-api
+  template: 
+    metadata: 
+      labels: 
+        app:  notification-api 
+        tier:  backend  
+    spec:  
+      containers: 
+        -  name:  notification-api 
+          image:  danielrsantos/notifiationapi:5
+          resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          ports: 
+            -  containerPort:  8080
