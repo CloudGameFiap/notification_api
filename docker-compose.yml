@@ -1,0 +1,15 @@
+services:
+  notificationapi:
+    image: ${DOCKER_REGISTRY-}notificationapi
+    build:
+      context: .
+      dockerfile: ./src/NotificationApi/Dockerfile
+    user: "root"              
+    restart: unless-stopped        
+    networks:
+      - cloudgame-network  
+
+networks:
+  cloudgame-network:
+    external: true
+    name: cloudgame-network
