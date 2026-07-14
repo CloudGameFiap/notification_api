@@ -1,4 +1,4 @@
-﻿using CloudGame.Contracts.Events;
+﻿using CloudGameCatalog.Consumer.Consumers.PaymentApi.PaymentProcessed;
 using MassTransit;
 
 namespace NotificationApi.Consumer
@@ -16,7 +16,7 @@ namespace NotificationApi.Consumer
         {
             var payment = context.Message;
 
-            if (payment.Status == "Approved")
+            if (payment.Status == UserGameStatus.PaymentApproved)
             {
                 _logger.LogInformation(
                     "Pagamento aprovado! Enviando e-mail a aprovação"
