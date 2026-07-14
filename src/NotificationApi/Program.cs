@@ -3,6 +3,7 @@ using NotificationApi.Consumer;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
     .WriteTo.Console()
     .CreateBootstrapLogger();
 
@@ -21,8 +22,8 @@ try
 
     builder.Services.AddMassTransit(x =>
     {
-        x.AddConsumer<UserCreatedConsumer>();
-        x.AddConsumer<PaymentProcessedConsumer>();
+        x.AddConsumer<UserCreatedNotificationConsumer>();
+        x.AddConsumer<PaymentProcessedNotificationConsumer>();
         x.UsingRabbitMq((ctx, cfg) =>
         {
             var rabbitMqSection = builder.Configuration.GetRequiredSection("RabbitMQ")!;
@@ -36,24 +37,30 @@ try
                     h.Password(password);
                 });
 
-                cfg.ReceiveEndpoint("CloudGame.Domain.Events.User:UserCreatedEvent", e =>
-                {
-                    e.Consumer<UserCreatedConsumer>(ctx);
-                });
+            cfg.ReceiveEndpoint("user-created-notification", e =>
+            {
+                e.Consumer<UserCreatedNotificationConsumer>(ctx);
+            });
 
-                cfg.ReceiveEndpoint("CloudGameCatalog.Consumer.Consumers.PaymentApi.PaymentProcessed:PaymentProcessedEvent", e =>
-                {
-                    e.Consumer<PaymentProcessedConsumer>(ctx);
-                });
+            cfg.ReceiveEndpoint("payment-processed-notification", e =>
+            {
+                e.Consumer<PaymentProcessedNotificationConsumer>(ctx);
+            });
 
         });
     });
+
+    builder.Services.AddOptions<MassTransitHostOptions>()
+    .Configure(options =>
+    {        
+        options.WaitUntilStarted = true;
+    });    
 
     var app = builder.Build();    
 
     Log.Information("Pipeline successfully configured and application initialized...");
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex) when (ex.GetType().Name != "HostAbortedException")
 {
