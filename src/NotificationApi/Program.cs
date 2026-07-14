@@ -19,24 +19,32 @@ try
     });
    
 
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<UserCreatedConsumer>();
-    x.AddConsumer<PaymentProcessedConsumer>();
-    x.UsingRabbitMq((ctx, cfg) =>
+    builder.Services.AddMassTransit(x =>
     {
-        var rabbitMqSection = builder.Configuration.GetRequiredSection("RabbitMQ")!;
-        var host = rabbitMqSection["Host"]!;
-        var username = rabbitMqSection["Username"]!;
-        var password = rabbitMqSection["Password"]!;
-
-        cfg.Host(host, "/", h =>
+        x.AddConsumer<UserCreatedConsumer>();
+        x.AddConsumer<PaymentProcessedConsumer>();
+        x.UsingRabbitMq((ctx, cfg) =>
         {
-            h.Username(username);
-            h.Password(password);
-        });
+            var rabbitMqSection = builder.Configuration.GetRequiredSection("RabbitMQ")!;
+            var host = rabbitMqSection["Host"]!;
+            var username = rabbitMqSection["Username"]!;
+            var password = rabbitMqSection["Password"]!;
 
-        cfg.ConfigureEndpoints(ctx);       
+                cfg.Host(host, "/", h =>
+                {
+                    h.Username(username);
+                    h.Password(password);
+                });
+
+                cfg.ReceiveEndpoint("CloudGame.Domain.Events.User:UserCreatedEvent", e =>
+                {
+                    e.Consumer<UserCreatedConsumer>(ctx);
+                });
+
+                cfg.ReceiveEndpoint("CloudGameCatalog.Consumer.Consumers.PaymentApi.PaymentProcessed:PaymentProcessedEvent", e =>
+                {
+                    e.Consumer<PaymentProcessedConsumer>(ctx);
+                });
 
         });
     });
