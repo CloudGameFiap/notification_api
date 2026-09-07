@@ -1,0 +1,39 @@
+apiVersion:  apps/v1 
+kind:  Deployment 
+metadata: 
+  name:  notification-api 
+  labels: 
+    app:  notification-api
+    tier:  backend  
+spec: 
+  replicas:  1 
+  selector: 
+    matchLabels: 
+      app:  notification-api
+  template: 
+    metadata: 
+      labels: 
+        app:  notification-api 
+        tier:  backend  
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done']          
+      containers: 
+        - name:  notification-api 
+          image:  danielrsantos/notifiationapi:5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          ports: 
+            - containerPort:  8080
+          envFrom:
+            - configMapRef:
+                name: notification-api-config
+            - secretRef:
+                name: notification-api-secret

@@ -1,11 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS base
 
-# Instala os pacotes ICU para habilitar suporte a dados e strings globais
-RUN apk add --no-cache icu-libs
-
-# Desativa o modo invariante de globalização exigido pelo SQL Server
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-
 # Define o diretório de trabalho antes de configurar o usuário
 WORKDIR /app
 
