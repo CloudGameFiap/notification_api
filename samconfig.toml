@@ -1,0 +1,18 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "notification-api-stack"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+resolve_image_repos = true
+confirm_changeset = true
+resolve_s3 = true
+
+# Preencha estes valores antes de rodar "sam deploy" pela primeira vez,
+# ou passe via --parameter-overrides na linha de comando
+parameter_overrides = [
+    "ImageUri=297797204483.dkr.ecr.us-east-1.amazonaws.com/notification-api:latest",
+    "MQBrokerArn=arn:aws:mq:us-east-1:297797204483:broker:notification-broker:b-05a8006d-7535-4a0c-8ea0-57123869a332",
+    "MQSecretArn=arn:aws:secretsmanager:us-east-1:297797204483:secret:notification-api/rabbitmq-credentials-ZSePz4",
+]
